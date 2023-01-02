@@ -42,12 +42,44 @@ encrypt(char* plaintext, char* key) {
    return ciphertext; 
 }
 
+char*
+decrypt(char* ciphertext, char* key) {
+    // Calculate the length of both ciphertext and key to be used in iteration.
+    size_t ciphertext_length = strlen(ciphertext);
+    size_t key_length = strlen(key);
+
+    // Create counters for iteration - kept outside of for loop initialisation as they need to be used out of loop scope.
+    size_t i;
+    size_t j;
+
+    // Create a variable to store plaintext - size will be determined by length of ciphertext, and +1 to account for null byte.
+    char* plaintext = (char*) malloc((sizeof(char) * ciphertext_length) + 1);
+
+    for (i = 0, j = 0; i < ciphertext_length && j < key_length + 1; i++, j++) {
+        // Check to see if j is equal to length of key, if so, set back to 0 to re-iterate through key until all letters are decrypted. 
+	if (j == key_length) {
+	    j = 0;
+	}
+
+	plaintext[i] = 'A' + (((ciphertext[i] - 'A') - (key[j] - 'A') + 26) % 26);
+    }
+
+    // Add null byte to end of plaintext string.
+    plaintext[i] = '\0';
+
+    // Return plaintext.
+    return plaintext;
+}
+
 int
 main() {
     char* ciphertext = encrypt("MYNAMEISMAX", "BALL"); 
-
     printf("%s with key %s is, %s\n", "MYNAMEISMAX", "BALL", ciphertext);
     free(ciphertext);
+
+    char* plaintext = decrypt("NYYLNETDNAI", "BALL");
+    printf("%s with key %s is, %s\n", "NYYLNETDNAI", "BALL", plaintext);
+    free(plaintext);
 
     return 0;
 }
