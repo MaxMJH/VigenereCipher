@@ -1,10 +1,7 @@
 // ToDo:
 // Make sure that there is a certain amount which the user can enter - perhaps 1mb (at least 1024 characters)?
-// Encrypt plaintext using Vigenere Cipher:
-//     To treat all input the same, capatalise each word and ignore space and punctuation (can use ctype.h).
-//     Go through each letter in both the plaintext and key - to ensure the key loops through, if a count is equal to key length, reset.
-//     For each letter in plaintext, turn it to ciphertext using:
-//         ciphertext = 'A' + (((plaintext[i] - 'A') + (key[j] - 'A')) % 26); 
+// Check to see if the key contains any punctuation or spaces:
+//     If so, notify the user, and stop all operations!
 
 // Include relevant headers.
 #include <stdio.h>
@@ -25,21 +22,37 @@ encrypt(char* plaintext, char* key) {
     // Create a variable to store ciphertext - size will be determined by length of plaintext, and +1 to account for null byte.
     char* ciphertext = (char*) malloc((sizeof(char) * plaintext_length) + 1);
 
-    for (i = 0, j = 0; i < plaintext_length && j < key_length + 1; i++, j++) {
+    for (i = 0, j = 0; i < plaintext_length && j < key_length + 1; i++, j++) { 
         // Check to see if j is equal to length of key, if so, set back to 0 to re-iterate through key until all letters are encrypted.	
 	if (j == key_length) {
 	    // Set j back to 0 to re-iterate through key.
 	    j = 0;
 	}
 
-	ciphertext[i] = 'A' + (((plaintext[i] - 'A') + (key[j] - 'A')) % 26);
+	// Ensure that user input is capitalised.
+	const char current_plaintext_character = toupper(plaintext[i]);
+        const char current_key_character = toupper(key[j]);
+
+	// Check to see if the current plaintext character is a space or punctuation.
+	if (isspace(current_plaintext_character) || ispunct(current_plaintext_character)) {
+	    // Add the character to the ciphertext.
+	    ciphertext[i] = current_plaintext_character;
+
+	    // Decrement the value of j so that the key's current position is not forwarded.
+	    --j;
+
+	    // Jump the current iteration. 
+	    continue;
+	}
+
+	ciphertext[i] = 'A' + (((current_plaintext_character - 'A') + (current_key_character - 'A')) % 26);
     }
 
     // Add null byte to end of ciphertext string.
     ciphertext[i] = '\0';
 
-   // Return ciphertext.
-   return ciphertext; 
+    // Return ciphertext.
+    return ciphertext; 
 }
 
 char*
@@ -61,7 +74,23 @@ decrypt(char* ciphertext, char* key) {
 	    j = 0;
 	}
 
-	plaintext[i] = 'A' + (((ciphertext[i] - 'A') - (key[j] - 'A') + 26) % 26);
+        // Ensure that user input is capitalised.
+	const char current_plaintext_character = toupper(ciphertext[i]);
+	const char current_key_character = toupper(key[j]);
+
+	// Check to see if the current ciphertext character is a space or punctuation.
+	if (isspace(current_plaintext_character) || ispunct(current_plaintext_character)) {
+	    // Add the character to the plaintext.
+	    plaintext[i] = current_plaintext_character;
+
+	    // Decrement the value of j so that the key's current position is not forwarded.
+	    --j;
+
+	    // Jump the current iteration.
+	    continue;
+	}
+
+	plaintext[i] = 'A' + (((current_plaintext_character - 'A') - (current_key_character - 'A') + 26) % 26);
     }
 
     // Add null byte to end of plaintext string.
@@ -73,8 +102,8 @@ decrypt(char* ciphertext, char* key) {
 
 int
 main() {
-    char* ciphertext = encrypt("MYNAMEISMAX", "BALL"); 
-    printf("%s with key %s is, %s\n", "MYNAMEISMAX", "BALL", ciphertext);
+    char* ciphertext = encrypt("MY NAME IS MAX!", "BALL"); 
+    printf("%s with key %s is, %s\n", "MY NAME IS MAX!", "BALL", ciphertext);
     free(ciphertext);
 
     char* plaintext = decrypt("NYYLNETDNAI", "BALL");
