@@ -9,9 +9,29 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+int iskeyvalid(char*);
 char* encrypt(char*, char*);
 char* decrypt(char*, char*);
 int ischaralpha(char, char*, size_t, size_t*);
+
+int
+iskeyvalid(char* key) {
+    int invalid_flag = 0;
+
+    for (size_t i = 0; i < strlen(key); i++) {
+        const char current_character = *(key + i);
+
+  	if (ispunct(current_character) || isspace(current_character)) {
+            invalid_flag = 1;
+	}
+
+	if (invalid_flag) {
+            return 0;
+	}
+    }
+
+    return 1;
+}
 
 char*
 encrypt(char* plaintext, char* key) {
@@ -94,7 +114,8 @@ decrypt(char* ciphertext, char* key) {
 
 int
 ischaralpha(char character, char* text, size_t current_i, size_t* current_j) {
-    // Check to see if the current character is whitespace or punctuation. 
+    // Check to see if the current character is whitespace or punctuation.
+    // NOTE - Could just check if current character is alphanumeric? 
     if (isspace(character) || ispunct(character)) {
 	// Add the character to the text.
         *(text + current_i) = character;
@@ -127,6 +148,9 @@ main() {
     plaintext = decrypt("NY YLNE TD NAI!", "BALL");
     printf("%s with key %s is, %s\n", "NY YLNE TD NAI!", "BALL", plaintext);
     free(plaintext);
+
+    char* key = "test ";
+    printf("Is key valid? %d\n", iskeyvalid(key));
 
     return 0;
 }
