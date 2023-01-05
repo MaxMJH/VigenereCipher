@@ -19,9 +19,9 @@ iskeyvalid(char* key) {
     int invalid_flag = 0;
 
     for (size_t i = 0; i < strlen(key); i++) {
-        const char current_character = *(key + i);
+        const char CURRENT_CHARACTER = *(key + i);
 
-  	if (ispunct(current_character) || isspace(current_character)) {
+  	if (ispunct(CURRENT_CHARACTER) || isspace(CURRENT_CHARACTER)) {
             invalid_flag = 1;
 	}
 
@@ -36,73 +36,73 @@ iskeyvalid(char* key) {
 char*
 encrypt(char* plaintext, char* key) {
     // Calculate the length of both plaintext and key to be used in iteration.
-    const size_t plaintext_length = strlen(plaintext);
-    const size_t key_length = strlen(key);
+    const size_t PLAINTEXT_LENGTH = strlen(plaintext);
+    const size_t KEY_LENGTH = strlen(key);
 
     // Create counters for iteration - kept outside of for loop initialisation as they need to be used out of loop scope. 
     size_t i;
     size_t j;
 
     // Create a variable to store ciphertext - size will be determined by length of plaintext, and +1 to account for null byte.
-    char* ciphertext = (char*) malloc((sizeof(char) * plaintext_length) + 1);
+    char* ciphertext = (char*) malloc((sizeof(char) * PLAINTEXT_LENGTH) + 1);
 
-    for (i = 0, j = 0; i < plaintext_length && j < key_length + 1; i++, j++) { 
+    for (i = 0, j = 0; i < PLAINTEXT_LENGTH && j < KEY_LENGTH + 1; i++, j++) { 
         // Check to see if j is equal to length of key, if so, set back to 0 to re-iterate through key until all letters are encrypted.	
-	if (j == key_length) {
+	if (j == KEY_LENGTH) {
 	    // Set j back to 0 to re-iterate through key.
 	    j = 0;
 	}
 
 	// Ensure that user input is capitalised.
-	const char current_plaintext_character = toupper(*(plaintext + i));
-        const char current_key_character = toupper(*(key + j));
+	const char CURRENT_PLAINTEXT_CHARACTER = toupper(*(plaintext + i));
+        const char CURRENT_KEY_CHARACTER = toupper(*(key + j));
 
         // Check to see if the current plaintext character is alphanumeric.	
-	if (!ischaralpha(current_plaintext_character, ciphertext, i, &j)) {
+	if (!ischaralpha(CURRENT_PLAINTEXT_CHARACTER, ciphertext, i, &j)) {
 	    // If the plaintext character is not alphanumeric, jump to the loop's next iteration.
 	    continue;
         }
 
-	*(ciphertext + i) = 'A' + (((current_plaintext_character - 'A') + (current_key_character - 'A')) % 26);
+	*(ciphertext + i) = 'A' + (((CURRENT_PLAINTEXT_CHARACTER - 'A') + (CURRENT_KEY_CHARACTER - 'A')) % 26);
     }
-
+    
     // Add null byte to end of ciphertext string.
-    *(ciphertext + i) = '\0';
-
-    // Return ciphertext.
+    *(ciphertext + i) = '\0'; 
+    
+    // Return ciphertext.  
     return ciphertext; 
 }
 
 char*
 decrypt(char* ciphertext, char* key) {
     // Calculate the length of both ciphertext and key to be used in iteration.
-    const size_t ciphertext_length = strlen(ciphertext);
-    const size_t key_length = strlen(key);
+    const size_t CIPHERTEXT_LENGTH = strlen(ciphertext);
+    const size_t KEY_LENGTH = strlen(key);
 
     // Create counters for iteration - kept outside of for loop initialisation as they need to be used out of loop scope.
     size_t i;
     size_t j;
 
     // Create a variable to store plaintext - size will be determined by length of ciphertext, and +1 to account for null byte.
-    char* plaintext = (char*) malloc((sizeof(char) * ciphertext_length) + 1);
+    char* plaintext = (char*) malloc((sizeof(char) * CIPHERTEXT_LENGTH) + 1);
 
-    for (i = 0, j = 0; i < ciphertext_length && j < key_length + 1; i++, j++) {
+    for (i = 0, j = 0; i < CIPHERTEXT_LENGTH && j < KEY_LENGTH + 1; i++, j++) {
         // Check to see if j is equal to length of key, if so, set back to 0 to re-iterate through key until all letters are decrypted. 
-	if (j == key_length) {
+	if (j == KEY_LENGTH) {
 	    j = 0;
 	}
 
         // Ensure that user input is capitalised.
-	const char current_ciphertext_character = toupper(*(ciphertext + i));
-	const char current_key_character = toupper(*(key + j));
+	const char CURRENT_CIPHERTEXT_CHARACTER = toupper(*(ciphertext + i));
+	const char CURRENT_KEY_CHARACTER = toupper(*(key + j));
 
         // Check to see if the current ciphertext character is alphanumeric.	
-	if (!ischaralpha(current_ciphertext_character, plaintext, i, &j)) {
+	if (!ischaralpha(CURRENT_CIPHERTEXT_CHARACTER, plaintext, i, &j)) {
 	    // If the ciphertext character is not alphanumeric, jump to the loop's next iteration.
 	    continue;
 	}
 
-	*(plaintext + i) = 'A' + (((current_ciphertext_character - 'A') - (current_key_character - 'A') + 26) % 26);
+	*(plaintext + i) = 'A' + (((CURRENT_CIPHERTEXT_CHARACTER - 'A') - (CURRENT_KEY_CHARACTER - 'A') + 26) % 26);
     }
 
     // Add null byte to end of plaintext string.
