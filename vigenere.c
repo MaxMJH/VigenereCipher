@@ -114,9 +114,8 @@ decrypt(char* ciphertext, char* key) {
 
 int
 ischaralpha(char character, char* text, size_t current_i, size_t* current_j) {
-    // Check to see if the current character is whitespace or punctuation.
-    // NOTE - Could just check if current character is alphanumeric? 
-    if (isspace(character) || ispunct(character)) {
+    // Check to see if the current character is a valid alphabetical letter. 
+    if (!isalpha(character)) {
 	// Add the character to the text.
         *(text + current_i) = character;
 
