@@ -34,8 +34,8 @@ encrypt(char* plaintext, char* key) {
 	}
 
 	// Ensure that user input is capitalised.
-	const char current_plaintext_character = toupper(plaintext[i]);
-        const char current_key_character = toupper(key[j]);
+	const char current_plaintext_character = toupper(*(plaintext + i));
+        const char current_key_character = toupper(*(key + j));
 
         // Check to see if the current plaintext character is alphanumeric.	
 	if (!ischaralpha(current_plaintext_character, ciphertext, i, &j)) {
@@ -73,8 +73,8 @@ decrypt(char* ciphertext, char* key) {
 	}
 
         // Ensure that user input is capitalised.
-	const char current_ciphertext_character = toupper(ciphertext[i]);
-	const char current_key_character = toupper(key[j]);
+	const char current_ciphertext_character = toupper(*(ciphertext + i));
+	const char current_key_character = toupper(*(key + j));
 
         // Check to see if the current ciphertext character is alphanumeric.	
 	if (!ischaralpha(current_ciphertext_character, plaintext, i, &j)) {
@@ -112,7 +112,7 @@ ischaralpha(char character, char* text, size_t current_i, size_t* current_j) {
 
 int
 main() {
-    char* ciphertext = encrypt("MY NAME IS MAX!", "BALL"); 
+    char* ciphertext = encrypt("my name is max!", "ball"); 
     printf("%s with key %s is, %s\n", "MY NAME IS MAX!", "BALL", ciphertext);
     free(ciphertext);
 
