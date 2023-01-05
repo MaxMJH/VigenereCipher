@@ -1,8 +1,3 @@
-// ToDo:
-// Make sure that there is a certain amount which the user can enter - perhaps 1mb (at least 1024 characters)?
-// Check to see if the key contains any punctuation or spaces:
-//     If so, notify the user, and stop all operations!
-
 // Include relevant headers.
 #include <stdio.h>
 #include <string.h>
@@ -132,24 +127,84 @@ ischaralpha(char character, char* text, size_t current_i, size_t* current_j) {
 
 int
 main() {
-    char* ciphertext = encrypt("my name is max!", "ball"); 
-    printf("%s with key %s is, %s\n", "MY NAME IS MAX!", "BALL", ciphertext);
-    free(ciphertext);
+    const unsigned int MAX_BUFFER = 1024; 
 
-    char* plaintext = decrypt("NYYLNETDNAI", "BALL");
-    printf("%s with key %s is, %s\n", "NYYLNETDNAI", "BALL", plaintext);
-    free(plaintext);
+    printf("Welcome to the non-technical, user-friendly Vigenere Cipher!\n");
+    printf("Please enter one of the following options (via their numerical ordering):\n");
+    printf("\t1. Encrypt\n");
+    printf("\t2. Decrypt\n");
+    printf("\t3. Exit\n");
 
-    ciphertext = encrypt("MYNAMEISMAX", "BALL");
-    printf("%s with key %s is, %s\n", "MYNAMEISMAX", "BALL", ciphertext);
-    free(ciphertext);
+    int* numerical_choice = malloc(sizeof(int));
 
-    plaintext = decrypt("NY YLNE TD NAI!", "BALL");
-    printf("%s with key %s is, %s\n", "NY YLNE TD NAI!", "BALL", plaintext);
-    free(plaintext);
+    while (scanf("%d", numerical_choice) == 1 && *numerical_choice != 3) {
+        switch (*numerical_choice) {
+            case 1: {
+                char* plaintext = malloc(MAX_BUFFER);
+	        char* key = malloc(MAX_BUFFER);
+                char* ciphertext;
 
-    char* key = "test ";
-    printf("Is key valid? %d\n", iskeyvalid(key));
+	        printf("\nEnter the plaintext - Note that it has a limit of 1023 characters!: ");
+	        scanf(" %1023[^\n]", plaintext);
+
+	        printf("Enter the key - Note that it has a limit of 1023 characters!: ");
+	        scanf(" %1023[^\n]", key);
+
+                if (!iskeyvalid(key)) {
+                    printf("\nThe key you have entered is not valid!\n");
+		    break;
+                }
+
+	        ciphertext = encrypt(plaintext, key);
+
+		printf("\nThe encrypted form is of the following:\n");
+	        printf("%s\n", ciphertext);
+
+		free(plaintext);
+		free(key);
+		free(ciphertext);
+	        
+		break;
+	    } 
+	    case 2: {
+	        char* ciphertext = malloc(MAX_BUFFER);
+	        char* key = malloc(MAX_BUFFER);
+	        char* plaintext;
+
+	        printf("\nEnter the ciphertext - Note that it has a limit of 1023 characters!: ");
+	        scanf(" %1023[^\n]", ciphertext);
+
+	        printf("Enter the key - Note that it has a limit of 1023 characters!: ");
+	        scanf(" %1023[^\n]", key);
+
+                if (!iskeyvalid(key)) {
+                    printf("\nThe key you have entered is not valid!\n");
+		    break;
+		}
+
+	        plaintext = decrypt(ciphertext, key);
+
+		printf("\nThe decrypted form is of the following:\n");
+	        printf("%s\n", plaintext);
+
+		free(ciphertext);
+		free(key);
+		free(plaintext);
+	        
+		break;
+	    }
+	    default:
+                printf("\nUnknown value entered!\n"); 
+		break;
+	}   
+        
+	printf("\nPlease enter one of the following options (via their numerical ordering):\n");
+        printf("\t1. Encrypt\n");
+	printf("\t2. Decrypt\n");
+	printf("\t3. Exit\n");
+    }
+
+    free(numerical_choice); 
 
     return 0;
 }
