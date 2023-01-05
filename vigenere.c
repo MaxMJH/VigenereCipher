@@ -9,11 +9,15 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+char* encrypt(char*, char*);
+char* decrypt(char*, char*);
+int ischaralpha(char, char*, size_t, size_t*);
+
 char*
 encrypt(char* plaintext, char* key) {
     // Calculate the length of both plaintext and key to be used in iteration.
-    size_t plaintext_length = strlen(plaintext);
-    size_t key_length = strlen(key);
+    const size_t plaintext_length = strlen(plaintext);
+    const size_t key_length = strlen(key);
 
     // Create counters for iteration - kept outside of for loop initialisation as they need to be used out of loop scope. 
     size_t i;
@@ -33,23 +37,17 @@ encrypt(char* plaintext, char* key) {
 	const char current_plaintext_character = toupper(plaintext[i]);
         const char current_key_character = toupper(key[j]);
 
-	// Check to see if the current plaintext character is a space or punctuation.
-	if (isspace(current_plaintext_character) || ispunct(current_plaintext_character)) {
-	    // Add the character to the ciphertext.
-	    ciphertext[i] = current_plaintext_character;
-
-	    // Decrement the value of j so that the key's current position is not forwarded.
-	    --j;
-
-	    // Jump the current iteration. 
+        // Check to see if the current plaintext character is alphanumeric.	
+	if (!ischaralpha(current_plaintext_character, ciphertext, i, &j)) {
+	    // If the plaintext character is not alphanumeric, jump to the loop's next iteration.
 	    continue;
-	}
+        }
 
-	ciphertext[i] = 'A' + (((current_plaintext_character - 'A') + (current_key_character - 'A')) % 26);
+	*(ciphertext + i) = 'A' + (((current_plaintext_character - 'A') + (current_key_character - 'A')) % 26);
     }
 
     // Add null byte to end of ciphertext string.
-    ciphertext[i] = '\0';
+    *(ciphertext + i) = '\0';
 
     // Return ciphertext.
     return ciphertext; 
@@ -58,8 +56,8 @@ encrypt(char* plaintext, char* key) {
 char*
 decrypt(char* ciphertext, char* key) {
     // Calculate the length of both ciphertext and key to be used in iteration.
-    size_t ciphertext_length = strlen(ciphertext);
-    size_t key_length = strlen(key);
+    const size_t ciphertext_length = strlen(ciphertext);
+    const size_t key_length = strlen(key);
 
     // Create counters for iteration - kept outside of for loop initialisation as they need to be used out of loop scope.
     size_t i;
@@ -75,29 +73,41 @@ decrypt(char* ciphertext, char* key) {
 	}
 
         // Ensure that user input is capitalised.
-	const char current_plaintext_character = toupper(ciphertext[i]);
+	const char current_ciphertext_character = toupper(ciphertext[i]);
 	const char current_key_character = toupper(key[j]);
 
-	// Check to see if the current ciphertext character is a space or punctuation.
-	if (isspace(current_plaintext_character) || ispunct(current_plaintext_character)) {
-	    // Add the character to the plaintext.
-	    plaintext[i] = current_plaintext_character;
-
-	    // Decrement the value of j so that the key's current position is not forwarded.
-	    --j;
-
-	    // Jump the current iteration.
+        // Check to see if the current ciphertext character is alphanumeric.	
+	if (!ischaralpha(current_ciphertext_character, plaintext, i, &j)) {
+	    // If the ciphertext character is not alphanumeric, jump to the loop's next iteration.
 	    continue;
 	}
 
-	plaintext[i] = 'A' + (((current_plaintext_character - 'A') - (current_key_character - 'A') + 26) % 26);
+	*(plaintext + i) = 'A' + (((current_ciphertext_character - 'A') - (current_key_character - 'A') + 26) % 26);
     }
 
     // Add null byte to end of plaintext string.
-    plaintext[i] = '\0';
+    *(plaintext + i) = '\0';
 
     // Return plaintext.
     return plaintext;
+}
+
+int
+ischaralpha(char character, char* text, size_t current_i, size_t* current_j) {
+    // Check to see if the current character is whitespace or punctuation. 
+    if (isspace(character) || ispunct(character)) {
+	// Add the character to the text.
+        *(text + current_i) = character;
+
+	// Decrement the value of j so that the key's current position is not forwarded.
+	*current_j -= 1;
+
+	// Signify that the character in question does contain whitespace or punctuation.
+	return 0;
+    } else {
+	// Signify that the character in question is alphanumeric.
+        return 1;
+    }
 }
 
 int
@@ -108,6 +118,14 @@ main() {
 
     char* plaintext = decrypt("NYYLNETDNAI", "BALL");
     printf("%s with key %s is, %s\n", "NYYLNETDNAI", "BALL", plaintext);
+    free(plaintext);
+
+    ciphertext = encrypt("MYNAMEISMAX", "BALL");
+    printf("%s with key %s is, %s\n", "MYNAMEISMAX", "BALL", ciphertext);
+    free(ciphertext);
+
+    plaintext = decrypt("NY YLNE TD NAI!", "BALL");
+    printf("%s with key %s is, %s\n", "NY YLNE TD NAI!", "BALL", plaintext);
     free(plaintext);
 
     return 0;
